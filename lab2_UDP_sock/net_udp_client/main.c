@@ -24,14 +24,14 @@ int main(void)
 
 	printf("UDP client\n");
 
-	sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); // create an endpoint for communication
 	if (sockfd < 0)
 	{
 		printf("socket() failed: %d\n", errno);
 		return -errno;
 	}
 
-	addr.sin_family = AF_INET;
+	addr.sin_family = AF_INET; // IPv4 internet protocols
 	addr.sin_port = htons(SOCK_PORT); // convert the unsigned short integer hostshort from
 									  // host byte order to network byte order.
 	addr.sin_addr.s_addr = htonl(SERVER_IP); // loopback interface address
@@ -73,6 +73,7 @@ int main(void)
 	}
 
 	printf("Sending message...\n", SERVER_IP);
+	 // send a message on a socket
 	if (sendto(sockfd, msg, strlen(msg), 0, (struct sockaddr*) &addr, sizeof (addr)) < 0)
 	{
 		printf("sendto() failed: %d\n", errno);

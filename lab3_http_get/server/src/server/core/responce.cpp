@@ -2,5 +2,5 @@
 
 void RestHandler::Responce::setStatusCode(const uint16_t &value)
 {
-	status_code = value;
+	//status_code = value;
 }

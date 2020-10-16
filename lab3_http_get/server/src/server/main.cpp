@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sys/wait.h>
 #include "core/rest_server.h"
 
 class A : public RestHandler
@@ -13,9 +14,19 @@ public:
 	}
 };
 
+RestServer server;
+
+void sigintCatcher(int signum)
+{
+	printf( "\nProccess Catched signal #%d\n", signum);
+	server.stop();
+	printf("Server stopped\n");
+	exit(0);
+}
+
 int main()
 {
-	RestServer server;
+	signal(SIGINT, sigintCatcher);
 	std::list<std::string> method = {"GET"};
 	server.addRoute(std::make_unique<RestRoute>("/test", std::unique_ptr<RestHandler>(new A(method))));
 	server.run();

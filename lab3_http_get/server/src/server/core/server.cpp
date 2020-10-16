@@ -24,6 +24,7 @@ bool TcpServer::listenSocket()
 	if (sockfd < 0)
 	{
 		printf("socket() failed: %d\n", errno);
+		perror("error: ");
 		return false;
 	}
 
@@ -34,12 +35,14 @@ bool TcpServer::listenSocket()
 	if (bind(sockfd, (struct sockaddr *) &server_addr, sizeof (server_addr)) < 0)
 	{
 		printf("bind() failed: %d\n", errno);
+		perror("error ");
 		return false;
 	}
 
 	if (listen(sockfd, max_connection) < 0)
 	{
 		printf("listen() failed: %d\n", errno);
+		perror("error ");
 		return false;
 	}
 
@@ -66,13 +69,17 @@ bool TcpServer::listenSocket()
 		if (nready < 0)
 		{
 			printf("pselect() failed: %d\n", errno);
+			perror("error ");
 			return false;
 		}
 
 		if (FD_ISSET(sockfd, &fd_read))
 		{
 			if (newConnection(sockfd) == false)
+			{
 				printf("accept() or fcntl() failed: %d\n", errno);
+				perror("error ");
+			}
 		}
 
 		for (auto iter = connections.rbegin(); iter != connections.rend(); ++iter)
@@ -82,6 +89,7 @@ bool TcpServer::listenSocket()
 			if (receive(conn, is_close_connection) == false)
 			{
 				printf("recvfrom() failed: %d\n", errno);
+				perror("error ");
 				return false;
 			}
 			else if(is_close_connection)
@@ -121,6 +129,7 @@ bool TcpServer::newConnection(int32_t fd)
 	if (is_failed)
 	{
 		printf("accept() failed: %d\n", errno);
+		perror("error ");
 	}
 	else
 	{
@@ -142,7 +151,7 @@ bool TcpServer::receive(int32_t conn, bool& is_close_conn)
 	if (bytes == -1)
 	{
 		printf("recvfrom() failed: %d\n", errno);
-		perror("Error");
+		perror("error");
 		return false;
 	}
 	else if (bytes == 0)
@@ -176,6 +185,11 @@ void TcpServer::write(int32_t socket,const std::string& package)
 	}
 
 	close(socket);
+}
+
+void TcpServer::closeSock()
+{
+	close(sockfd);
 }
 
 void TcpServer::setListenLocal(bool value)

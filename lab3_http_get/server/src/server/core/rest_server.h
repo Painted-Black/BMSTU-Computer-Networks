@@ -12,6 +12,7 @@ class RestServer final
 public:
 	void addRoute(std::unique_ptr<RestRoute>);
 	void run();
+	void stop();
 
 private:
 	void receivePackage(const std::string&, int32_t);

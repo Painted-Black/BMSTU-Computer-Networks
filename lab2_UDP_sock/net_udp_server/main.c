@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <sys/wait.h>
 
 #include "info.h"
 
@@ -23,11 +24,23 @@ int my_strtev(char *str);
 int convert_to_add_code(const char* str, char** result);
 void invert(char** str);
 void add_unit(char** str);
+void sigint_catcher(int signum);
+
+int sockfd;
+
+// socket(int domain, int type, int protocol) -- создание дескриптора сокета
+
+void sigint_catcher(int signum)
+{
+	printf( "\nProccess Catched signal #%d\n", signum);
+	close(sockfd);
+	exit(0);
+}
 
 int main(void)
 {
+	signal(SIGINT, sigint_catcher);
 	printf("UDP server\n");
-	int sockfd;
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t clilen = sizeof (client_addr);
 	int cur_msg_len;
@@ -41,19 +54,20 @@ int main(void)
 
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(SOCK_PORT);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Address to accept any incoming messages.
 
+	// bind a name to a socket
 	if (bind(sockfd, (struct sockaddr*) &server_addr, sizeof (server_addr)) < 0)
 	{
 		printf("bind() failed: %d\n", errno);
 		return -errno;
 	}
 
-	if (make_socket_nonblocking(sockfd) == -1)
-	{
-	   printf("fcntl() failed: %d\n", errno);
-	   return EXIT_FAILURE;
-	}
+//	if (make_socket_nonblocking(sockfd) == -1)
+//	{
+//	   printf("fcntl() failed: %d\n", errno);
+//	   return EXIT_FAILURE;
+//	}
 
 	printf("Server is running on %s:%d\n", inet_ntoa(server_addr.sin_addr),
 		   ntohs(server_addr.sin_port));
@@ -62,6 +76,7 @@ int main(void)
 	for (;;)
 	{
 		char msg[MSG_LEN] = { '\0' };
+		// receive a message from a socket
 		cur_msg_len = recvfrom(sockfd, msg, MSG_LEN, 0, (struct sockaddr *) &client_addr, &clilen);
 		if (cur_msg_len != -1)
 		{

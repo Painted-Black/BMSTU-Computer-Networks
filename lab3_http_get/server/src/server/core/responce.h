@@ -8,8 +8,8 @@ class RestHandler::Responce : public RestData
 {
 public:
 	void setStatusCode(const uint16_t &value);
-	void
-
+	//void
+#pragma message "TODO"
 private:
 	uint16_t status_code;
 };
