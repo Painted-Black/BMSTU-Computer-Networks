@@ -1,2 +1,3 @@
 *.pro.user
-*/build/
+lab3_http_get/server/src/server/build/
+
