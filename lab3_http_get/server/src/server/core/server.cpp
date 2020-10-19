@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <algorithm>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h> // inet_ntoa
@@ -157,7 +158,7 @@ bool TcpServer::receive(int32_t conn, bool& is_close_conn)
 	else if (bytes == 0)
 	{
 		printf("Client %s disconnected.\n", inet_ntoa(client_addr.sin_addr));
-		close(conn);
+		closeConnection(conn);
 		is_close_conn = true;
 	}
 	else
@@ -183,11 +184,19 @@ void TcpServer::write(int32_t socket,const std::string& package)
 	{
 		perror("error:");
 	}
-
-	close(socket);
 }
 
-void TcpServer::closeSock()
+void TcpServer::closeConnection(int32_t sock)
+{
+	auto iter = std::find(connections.begin(), connections.end(), sock);
+	if (iter != connections.end())
+	{
+		connections.erase(iter);
+	}
+	close(sock);
+}
+
+void TcpServer::stop()
 {
 	close(sockfd);
 }

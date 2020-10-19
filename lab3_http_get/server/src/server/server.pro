@@ -12,6 +12,7 @@ SOURCES += \
         core/rest_route.cpp \
         core/rest_server.cpp \
         core/server.cpp \
+        core/server_stat.cpp \
         main.cpp
 
 HEADERS += \
@@ -22,4 +23,5 @@ HEADERS += \
     core/rest_handler.h \
     core/rest_route.h \
     core/rest_server.h \
-    core/server.h
+    core/server.h \
+    core/server_stat.h

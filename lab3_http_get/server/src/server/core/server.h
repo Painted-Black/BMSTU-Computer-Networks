@@ -20,7 +20,8 @@ public:
 	bool isListenLocal() const;
 	void setHandlerCallback(std::function<void(const std::string&, int32_t)> value);
 	void write(int32_t, const std::string&);
-	void closeSock();
+	void closeConnection(int32_t);
+	void stop();
 
 private:
 	inline bool newConnection(int32_t);

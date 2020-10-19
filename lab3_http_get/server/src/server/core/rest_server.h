@@ -17,7 +17,7 @@ public:
 private:
 	void receivePackage(const std::string&, int32_t);
 	RestHandler::Request parsePackage(const std::string&);
-	std::string writeResponce(const RestHandler::Responce&);
+	void writeResponce(int32_t, const RestHandler::Responce&);
 	std::list<std::string> split(const std::string&, const std::string&);
 	std::string trim(const std::string&, const std::string&);
 

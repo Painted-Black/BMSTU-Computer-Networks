@@ -7,10 +7,18 @@
 class RestHandler::Responce : public RestData
 {
 public:
-	void setStatusCode(const uint16_t &value);
-	//void
-#pragma message "TODO"
+	enum StatusCode
+	{
+		Ok = 200,
+		Created = 201,
+		NotFound = 404,
+		MethodNotAllowed = 405
+	};
+public:
+	Responce();
+	void setStatusCode(StatusCode);
+	const std::string& getStatus() const;
 private:
-	uint16_t status_code;
+	std::string status_code;
 };
 

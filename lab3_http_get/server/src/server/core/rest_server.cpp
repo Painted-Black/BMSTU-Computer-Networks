@@ -1,6 +1,7 @@
 #include <sstream>
 #include <algorithm>
 #include <sys/wait.h>
+#include "responce.h"
 #include "rest_server.h"
 #include "request.h"
 
@@ -14,7 +15,7 @@ void RestServer::run()
 	using namespace std::placeholders;
 	tcp_socket_server.setMaxConnection(6);
 	tcp_socket_server.setListenLocal(false);
-	tcp_socket_server.setPort(8889);
+	tcp_socket_server.setPort(8888);
 	std::function<void(const std::string&, int32_t)> socket_handler =
 			std::bind(&RestServer::receivePackage, this, _1, _2);
 	tcp_socket_server.setHandlerCallback(socket_handler);
@@ -23,13 +24,12 @@ void RestServer::run()
 
 void RestServer::stop()
 {
-	tcp_socket_server.closeSock();
+	tcp_socket_server.stop();
 }
 
 void RestServer::receivePackage(const std::string& data, int32_t socket)
 {
 	auto request = parsePackage(data);
-	request.setRawDescriptor(socket);
 	if (routes.count(request.getRoute()))
 	{
 		auto& handler_orig = routes[request.getRoute()]->getHandler();
@@ -38,17 +38,24 @@ void RestServer::receivePackage(const std::string& data, int32_t socket)
 		bool is_find = std::find(methods.cbegin(), methods.cend(), request_method) != methods.cend();
 		if (is_find)
 		{
+			RestHandler::Responce responce = handler_orig.receive(request);
+			writeResponce(socket, responce);
+			tcp_socket_server.closeConnection(socket);
 		}
 		else
 		{
-//			405 Method not allowed
+			RestHandler::Responce responce;
+			responce.setStatusCode(RestHandler::Responce::MethodNotAllowed);
+			writeResponce(socket, responce);
+			tcp_socket_server.closeConnection(socket);
 		}
-//		auto handler =
 	}
 	else
 	{
-		tcp_socket_server.write(socket, std::to_string(404));
-		/*404 Not found*/
+		RestHandler::Responce responce;
+		responce.setStatusCode(RestHandler::Responce::NotFound);
+		writeResponce(socket, responce);
+		tcp_socket_server.closeConnection(socket);
 	}
 }
 
@@ -105,9 +112,30 @@ RestHandler::Request RestServer::parsePackage(const std::string& data)
 	return request;
 }
 
-std::string RestServer::writeResponce(const RestHandler::Responce& responce)
-{
+void RestServer::writeResponce(int32_t raw_socket, const RestHandler::Responce& responce)
+{		
+	constexpr char Line_Delimer[] = "\r\n";
+	constexpr char Header_Delimer[] = ": ";
+	constexpr char ContentLenghtHeader[] = "Content-Length";
 
+	std::stringstream sstream;
+	sstream << responce.getHttpVersion() << " " << responce.getStatus() << Line_Delimer;
+	auto headers = responce.getHeaders();
+	auto write_header_responce = [&](const std::pair<std::string, std::string>& header)
+	{
+		sstream << header.first << Header_Delimer << header.second << Line_Delimer;
+	};
+
+	const std::string& body_ref = responce.getBody();
+	std::for_each(headers.cbegin(), headers.cend(), write_header_responce);
+	if (headers.count(ContentLenghtHeader) == 0)
+	{
+		write_header_responce({ContentLenghtHeader, std::to_string(body_ref.size())});
+	}
+	sstream << Line_Delimer;
+	tcp_socket_server.write(raw_socket, sstream.str());
+
+	tcp_socket_server.write(raw_socket, body_ref);
 }
 
 std::list<std::string> RestServer::split(const std::string& text, const std::string& del)

@@ -60,6 +60,7 @@ SOURCES       = ../core/connection_handler.cpp \
 		../core/rest_route.cpp \
 		../core/rest_server.cpp \
 		../core/server.cpp \
+		../core/server_stat.cpp \
 		../main.cpp 
 OBJECTS       = connection_handler.o \
 		request.o \
@@ -69,6 +70,7 @@ OBJECTS       = connection_handler.o \
 		rest_route.o \
 		rest_server.o \
 		server.o \
+		server_stat.o \
 		main.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -154,7 +156,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		core/rest_handler.h \
 		core/rest_route.h \
 		core/rest_server.h \
-		core/server.h ../core/connection_handler.cpp \
+		core/server.h \
+		core/server_stat.h ../core/connection_handler.cpp \
 		../core/request.cpp \
 		../core/responce.cpp \
 		../core/rest_data.cpp \
@@ -162,6 +165,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../core/rest_route.cpp \
 		../core/rest_server.cpp \
 		../core/server.cpp \
+		../core/server_stat.cpp \
 		../main.cpp
 QMAKE_TARGET  = server
 DESTDIR       = 
@@ -400,20 +404,28 @@ rest_route.o: ../core/rest_route.cpp ../core/rest_route.h \
 		../core/rest_handler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rest_route.o ../core/rest_route.cpp
 
-rest_server.o: ../core/rest_server.cpp ../core/rest_server.h \
-		../core/rest_route.h \
+rest_server.o: ../core/rest_server.cpp ../core/responce.h \
+		../core/rest_data.h \
 		../core/rest_handler.h \
+		../core/rest_server.h \
+		../core/rest_route.h \
 		../core/server.h \
-		../core/connection_handler.h
+		../core/connection_handler.h \
+		../core/request.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rest_server.o ../core/rest_server.cpp
 
 server.o: ../core/server.cpp ../core/server.h \
 		../core/connection_handler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o ../core/server.cpp
 
-main.o: ../main.cpp ../core/rest_server.h \
-		../core/rest_route.h \
+server_stat.o: ../core/server_stat.cpp ../core/server_stat.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server_stat.o ../core/server_stat.cpp
+
+main.o: ../main.cpp ../core/responce.h \
+		../core/rest_data.h \
 		../core/rest_handler.h \
+		../core/rest_server.h \
+		../core/rest_route.h \
 		../core/server.h \
 		../core/connection_handler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp

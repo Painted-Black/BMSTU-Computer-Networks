@@ -45,14 +45,3 @@ void RestData::setMethod(const std::string & mt)
 {
 	method = mt;
 }
-
-int32_t RestData::getRawDescriptor() const
-{
-	return raw_fd;
-}
-
-void RestData::setRawDescriptor(int32_t value)
-{
-	raw_fd = value;
-}
-
