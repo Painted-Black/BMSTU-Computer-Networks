@@ -11,9 +11,11 @@ SOURCES += \
         core/rest_handler.cpp \
         core/rest_route.cpp \
         core/rest_server.cpp \
-        core/server.cpp \
-        core/server_stat.cpp \
-        main.cpp
+		core/server.cpp \
+        main.cpp \
+        statistic/statistic.cpp \
+        statistic/statistic_server.cpp \
+        thread_pool.cpp
 
 HEADERS += \
     core/connection_handler.h \
@@ -23,5 +25,9 @@ HEADERS += \
     core/rest_handler.h \
     core/rest_route.h \
     core/rest_server.h \
-    core/server.h \
-    core/server_stat.h
+	core/server.h \
+    statistic/statistic.h \
+    statistic/statistic_server.h \
+    thread_pool.h
+
+LIBS += -pthread

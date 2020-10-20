@@ -6,9 +6,12 @@
 #include <functional>
 #include "connection_handler.h"
 
-class TcpServer
+class TcpServer final
 {
+	class ConnectionList;
 public:
+	TcpServer();
+	~TcpServer();
 	void setPort(const int32_t &value);
 	void setListenLocal(bool value);
 	void setMaxConnection(const uint16_t &value);
@@ -32,6 +35,6 @@ private:
 	int32_t port = -1;
 	uint16_t max_connection = 10;
 	bool listen_local = false;
-	std::list<int32_t> connections;
+	std::unique_ptr<ConnectionList> connections;
 	std::function<void(const std::string&, int32_t)> cb_handler;
 };

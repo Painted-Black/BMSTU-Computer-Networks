@@ -1,3 +1,4 @@
+#include <mutex>
 #include <utility>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,12 +11,23 @@
 #include <arpa/inet.h> // inet_ntoa
 #include "server.h"
 
+class TcpServer::ConnectionList
+{
+public:
+	using reverse_iterator = std::list<int32_t>::reverse_iterator;
+public:
+	void push_back(int32_t val);
+	void remove(int32_t val);
+	reverse_iterator rbegin();
+	reverse_iterator rend();
+private:
+	std::list<int32_t> connections;
+	std::mutex mutex;
+};
+
 bool TcpServer::listenSocket()
 {
-	for (auto& conn : connections)
-	{
-		conn = -1;
-	}
+	connections.reset(new ConnectionList());
 
 	int nready, maxfd;
 	struct sockaddr_in server_addr;
@@ -32,8 +44,8 @@ bool TcpServer::listenSocket()
 	uint32_t type_connection = listen_local ? INADDR_LOOPBACK : INADDR_ANY;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl(type_connection);
-	server_addr.sin_port = htons(port);
-	if (bind(sockfd, (struct sockaddr *) &server_addr, sizeof (server_addr)) < 0)
+	server_addr.sin_port = htons(static_cast<uint16_t>(port));
+	if (bind(sockfd, reinterpret_cast<struct sockaddr *>(&server_addr), sizeof (server_addr)) < 0)
 	{
 		printf("bind() failed: %d\n", errno);
 		perror("error ");
@@ -57,16 +69,16 @@ bool TcpServer::listenSocket()
 
 		maxfd = sockfd;
 
-		for (auto& conn : connections)
-		{
-			if (conn != -1)
-			{
-				FD_SET(conn, &fd_read);
-			}
-			maxfd = (conn > maxfd) ? (conn) : (maxfd);
-		}
+//		for (auto& conn : connections)
+//		{
+//			if (conn != -1)
+//			{
+//				FD_SET(conn, &fd_read);
+//			}
+//			maxfd = (conn > maxfd) ? (conn) : (maxfd);
+//		}
 
-		nready = pselect(maxfd + 1, &fd_read, NULL, NULL, NULL, NULL);
+		nready = pselect(maxfd + 1, &fd_read, nullptr, nullptr, nullptr, nullptr);
 		if (nready < 0)
 		{
 			printf("pselect() failed: %d\n", errno);
@@ -83,7 +95,7 @@ bool TcpServer::listenSocket()
 			}
 		}
 
-		for (auto iter = connections.rbegin(); iter != connections.rend(); ++iter)
+		for (auto iter = connections->rbegin(); iter != connections->rend(); ++iter)
 		{
 			auto conn = *iter;
 			bool is_close_connection = false;
@@ -95,7 +107,7 @@ bool TcpServer::listenSocket()
 			}
 			else if(is_close_connection)
 			{
-				connections.erase(iter.base());
+				connections->remove(*iter);
 			}
 		}
 	}
@@ -125,7 +137,7 @@ bool TcpServer::newConnection(int32_t fd)
 {
 	struct sockaddr_in client_addr;
 	socklen_t clilen = sizeof (client_addr);
-	int connfd = accept(fd, (struct sockaddr *) &client_addr, &clilen);
+	int connfd = accept(fd, reinterpret_cast<struct sockaddr *>(&client_addr), &clilen);
 	bool is_failed = connfd < 0;
 	if (is_failed)
 	{
@@ -134,7 +146,7 @@ bool TcpServer::newConnection(int32_t fd)
 	}
 	else
 	{
-		connections.push_back(connfd);
+		connections->push_back(connfd);
 	}
 
 	return (is_failed == false);
@@ -148,7 +160,8 @@ bool TcpServer::receive(int32_t conn, bool& is_close_conn)
 	struct sockaddr_in client_addr;
 	socklen_t clilen = sizeof (client_addr);
 
-	int bytes = recvfrom(conn, msg_buffer, BufferSize, 0, (struct sockaddr *) &client_addr, &clilen);
+	auto bytes = recvfrom(conn, msg_buffer, BufferSize, 0,
+						  reinterpret_cast<struct sockaddr *>(&client_addr), &clilen);
 	if (bytes == -1)
 	{
 		printf("recvfrom() failed: %d\n", errno);
@@ -188,11 +201,7 @@ void TcpServer::write(int32_t socket,const std::string& package)
 
 void TcpServer::closeConnection(int32_t sock)
 {
-	auto iter = std::find(connections.begin(), connections.end(), sock);
-	if (iter != connections.end())
-	{
-		connections.erase(iter);
-	}
+	connections->remove(sock);
 	close(sock);
 }
 
@@ -206,7 +215,35 @@ void TcpServer::setListenLocal(bool value)
 	listen_local = value;
 }
 
+TcpServer::TcpServer() = default;
+
+TcpServer::~TcpServer() = default;
+
 void TcpServer::setPort(const int32_t &value)
 {
 	port = value;
+}
+
+void TcpServer::ConnectionList::push_back(int32_t val)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	connections.push_back(val);
+}
+
+void TcpServer::ConnectionList::remove(int32_t val)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	connections.remove(val);
+}
+
+TcpServer::ConnectionList::reverse_iterator TcpServer::ConnectionList::rbegin()
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	return connections.rbegin();
+}
+
+TcpServer::ConnectionList::reverse_iterator TcpServer::ConnectionList::rend()
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	return connections.rend();
 }

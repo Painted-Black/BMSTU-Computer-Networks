@@ -2,6 +2,7 @@
 #include <sys/wait.h>
 #include "core/responce.h"
 #include "core/rest_server.h"
+#include "statistic/statistic_server.h"
 
 class A : public RestHandler
 {
@@ -54,6 +55,7 @@ __attribute__((noreturn)) void sigintCatcher(int signum)
 int main()
 {
 	signal(SIGINT, sigintCatcher);
+	std::shared_ptr<Statistic> statistic(new StatisticServer());
 	std::list<std::string> method = {"GET"};
 	server.addRoute(std::make_unique<RestRoute>("/tests", std::unique_ptr<RestHandler>(new A(method))));
 	server.addRoute(std::make_unique<RestRoute>("/hellos", std::unique_ptr<RestHandler>(new B(method))));
