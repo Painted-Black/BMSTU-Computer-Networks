@@ -1,9 +1,15 @@
+#include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <sys/wait.h>
 #include "responce.h"
 #include "rest_server.h"
 #include "request.h"
+
+void RestServer::setStatistic(std::shared_ptr<Statistic> statistic)
+{
+	this->statistic = statistic;
+}
 
 void RestServer::addRoute(std::unique_ptr<RestRoute> route)
 {
@@ -12,13 +18,21 @@ void RestServer::addRoute(std::unique_ptr<RestRoute> route)
 
 void RestServer::run()
 {
+	pool.reset(new ThreadPool(10));
 	using namespace std::placeholders;
 	tcp_socket_server.setMaxConnection(6);
 	tcp_socket_server.setListenLocal(false);
 	tcp_socket_server.setPort(8888);
 	std::function<void(const std::string&, int32_t)> socket_handler =
 			std::bind(&RestServer::receivePackage, this, _1, _2);
-	tcp_socket_server.setHandlerCallback(socket_handler);
+	tcp_socket_server.setHandlerCallback([&](const std::string& data, int32_t socket)
+	{
+		pool->enqueue([&](std::string __data, int32_t __socket)
+		{
+			std::cout << "Current thread id " << std::this_thread::get_id() << std::endl;
+			receivePackage(__data, __socket);
+		}, data, socket);
+	});
 	tcp_socket_server.listenSocket();
 }
 

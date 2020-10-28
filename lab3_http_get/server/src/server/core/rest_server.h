@@ -6,10 +6,15 @@
 #include <list>
 #include "rest_route.h"
 #include "server.h"
+#include "statistic/statistic.h"
+#include "thread_pool.h"
+
+class ThreadPool;
 
 class RestServer final
 {
 public:
+	void setStatistic(std::shared_ptr<Statistic>);
 	void addRoute(std::unique_ptr<RestRoute>);
 	void run();
 	void stop();
@@ -24,5 +29,7 @@ private:
 private:
 	std::map<std::string, std::unique_ptr<RestRoute>> routes;
 	TcpServer tcp_socket_server;
+	std::unique_ptr<ThreadPool> pool;
+	std::shared_ptr<Statistic> statistic;
 };
 
