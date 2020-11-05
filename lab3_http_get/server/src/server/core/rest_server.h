@@ -20,7 +20,7 @@ public:
 	void stop();
 
 private:
-	void receivePackage(const std::string&, int32_t);
+	void receivePackage(const std::string&, const std::string &addr, int32_t);
 	RestHandler::Request parsePackage(const std::string&);
 	void writeResponce(int32_t, const RestHandler::Responce&);
 	std::list<std::string> split(const std::string&, const std::string&);
