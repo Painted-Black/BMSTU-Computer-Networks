@@ -80,12 +80,11 @@ def send_email(msg, host, pswd):
 	server = smtplib.SMTP(host) # create server
 	
 	server.starttls() # Puts the connection to the SMTP server into TLS mode
-	# Transport Layer Security (TLS) is cryptographic protocol designed to provide communications security over a computer network
-	
+	# Transport Layer Security (TLS) is cryptographic protocol designed to provide communications security over a computer network	
+
 	# Login Credentials for sending the mail
 	server.login(msg['From'], pswd)
 	server.sendmail(msg['From'], msg['To'], msg.as_string())
-	
 	server.quit()
 	#try:
 	#except smtplib.SMTPAuthenticationError:
@@ -115,11 +114,18 @@ def main():
 	msg.attach(MIMEText(message, 'plain'))
 	msg = attach_files(msg, args.dir, args.keyword)
 
-	is_ok = send_email(msg, 'smtp.gmail.com: 587', args.pswd)
+	is_ok = None
+	try:
+		is_ok = send_email(msg, 'smtp.gmail.com: 587', args.pswd)
+		print("Successfully send message to " + msg['To'])
+	except Exception as e:
+		print('Something went wrong, cannot send message!')
+		print(e)
+	if (is_ok != None):
+		print("The following recepients were rejected: ")
+		print(is_ok)
 	# Порт для TLS/STARTTLS: 587
 	# see https://support.google.com/mail/answer/7126229?hl=ru
-
-	print("Successfully send message to " + msg['To'])
 
 if __name__ == "__main__":
 	main()
