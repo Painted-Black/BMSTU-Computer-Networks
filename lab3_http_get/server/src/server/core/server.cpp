@@ -1,3 +1,4 @@
+#include <map>
 #include <mutex>
 #include <utility>
 #include <stdio.h>
@@ -14,14 +15,14 @@
 class TcpServer::ConnectionList
 {
 public:
-	using reverse_iterator = std::list<int32_t>::reverse_iterator;
+	using reverse_iterator = std::map<int32_t, std::string>::reverse_iterator;
 public:
-	void push_back(int32_t val);
+	void insert(int32_t val, const std::string&);
 	void remove(int32_t val);
 	reverse_iterator rbegin();
 	reverse_iterator rend();
 private:
-	std::list<int32_t> connections;
+	std::map<int32_t, std::string> connections;
 	std::mutex mutex;
 };
 
@@ -99,7 +100,7 @@ bool TcpServer::listenSocket()
 		{
 			auto conn = *iter;
 			bool is_close_connection = false;
-			if (receive(conn, is_close_connection) == false)
+			if (receive(conn.first, conn.second, is_close_connection) == false)
 			{
 				printf("recvfrom() failed: %d\n", errno);
 				perror("error ");
@@ -107,7 +108,7 @@ bool TcpServer::listenSocket()
 			}
 			else if(is_close_connection)
 			{
-				connections->remove(*iter);
+				connections->remove(conn.first);
 			}
 		}
 	}
@@ -146,13 +147,14 @@ bool TcpServer::newConnection(int32_t fd)
 	}
 	else
 	{
-		connections->push_back(connfd);
+		std::string net = inet_ntoa(client_addr.sin_addr);
+		connections->insert(connfd, net);
 	}
 
 	return (is_failed == false);
 }
 
-bool TcpServer::receive(int32_t conn, bool& is_close_conn)
+bool TcpServer::receive(int32_t conn, const std::string& addr, bool& is_close_conn)
 {
 	constexpr uint16_t BufferSize = 1024;
 	is_close_conn = false;
@@ -178,7 +180,7 @@ bool TcpServer::receive(int32_t conn, bool& is_close_conn)
 	{
 		if (cb_handler != nullptr)
 		{
-			cb_handler(std::string(msg_buffer), conn);
+			cb_handler(std::string(msg_buffer), addr, conn);
 		}
 //		printf("Got message from client %d: %s", serial, msg);
 	}
@@ -186,7 +188,7 @@ bool TcpServer::receive(int32_t conn, bool& is_close_conn)
 	return true;
 }
 
-void TcpServer::setHandlerCallback(std::function<void (const std::string&, int32_t)> value)
+void TcpServer::setHandlerCallback(std::function<void (const std::string&, const std::string&, int32_t)> value)
 {
 	cb_handler = value;
 }
@@ -224,16 +226,16 @@ void TcpServer::setPort(const int32_t &value)
 	port = value;
 }
 
-void TcpServer::ConnectionList::push_back(int32_t val)
+void TcpServer::ConnectionList::insert(int32_t val, const std::string & ip)
 {
 	std::lock_guard<std::mutex> lock(mutex);
-	connections.push_back(val);
+	connections[val] = ip;
 }
 
 void TcpServer::ConnectionList::remove(int32_t val)
 {
 	std::lock_guard<std::mutex> lock(mutex);
-	connections.remove(val);
+	connections.erase(val);
 }
 
 TcpServer::ConnectionList::reverse_iterator TcpServer::ConnectionList::rbegin()

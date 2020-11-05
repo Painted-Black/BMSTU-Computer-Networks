@@ -60,6 +60,8 @@ SOURCES       = ../core/connection_handler.cpp \
 		../core/rest_route.cpp \
 		../core/rest_server.cpp \
 		../core/server.cpp \
+		../handler/handler_statistic.cpp \
+		../handler/html_file_handler.cpp \
 		../main.cpp \
 		../statistic/statistic.cpp \
 		../statistic/statistic_server.cpp \
@@ -72,6 +74,8 @@ OBJECTS       = connection_handler.o \
 		rest_route.o \
 		rest_server.o \
 		server.o \
+		handler_statistic.o \
+		html_file_handler.o \
 		main.o \
 		statistic.o \
 		statistic_server.o \
@@ -268,6 +272,8 @@ DIST          = /opt/Qt/5.12.6/gcc_64/mkspecs/features/spec_pre.prf \
 		core/rest_route.h \
 		core/rest_server.h \
 		core/server.h \
+		handler/handler_statistic.h \
+		handler/html_file_handler.h \
 		statistic/statistic.h \
 		statistic/statistic_server.h \
 		thread_pool.h ../core/connection_handler.cpp \
@@ -278,6 +284,8 @@ DIST          = /opt/Qt/5.12.6/gcc_64/mkspecs/features/spec_pre.prf \
 		../core/rest_route.cpp \
 		../core/rest_server.cpp \
 		../core/server.cpp \
+		../handler/handler_statistic.cpp \
+		../handler/html_file_handler.cpp \
 		../main.cpp \
 		../statistic/statistic.cpp \
 		../statistic/statistic_server.cpp \
@@ -740,6 +748,7 @@ rest_server.o: ../core/rest_server.cpp ../core/responce.h \
 		../core/rest_route.h \
 		../core/server.h \
 		../core/connection_handler.h \
+		../statistic/statistic.h \
 		../thread_pool.h \
 		../core/request.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rest_server.o ../core/rest_server.cpp
@@ -748,6 +757,23 @@ server.o: ../core/server.cpp ../core/server.h \
 		../core/connection_handler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o ../core/server.cpp
 
+handler_statistic.o: ../handler/handler_statistic.cpp ../handler/handler_statistic.h \
+		../core/responce.h \
+		../core/rest_data.h \
+		../core/rest_handler.h \
+		../statistic/statistic_server.h \
+		../statistic/statistic.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o handler_statistic.o ../handler/handler_statistic.cpp
+
+html_file_handler.o: ../handler/html_file_handler.cpp ../core/request.h \
+		../core/rest_data.h \
+		../core/rest_handler.h \
+		../handler/html_file_handler.h \
+		../core/responce.h \
+		../statistic/statistic_server.h \
+		../statistic/statistic.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o html_file_handler.o ../handler/html_file_handler.cpp
+
 main.o: ../main.cpp ../core/responce.h \
 		../core/rest_data.h \
 		../core/rest_handler.h \
@@ -755,13 +781,18 @@ main.o: ../main.cpp ../core/responce.h \
 		../core/rest_route.h \
 		../core/server.h \
 		../core/connection_handler.h \
-		../thread_pool.h
+		../statistic/statistic.h \
+		../thread_pool.h \
+		../handler/handler_statistic.h \
+		../statistic/statistic_server.h \
+		../handler/html_file_handler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
 statistic.o: ../statistic/statistic.cpp ../statistic/statistic.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o statistic.o ../statistic/statistic.cpp
 
-statistic_server.o: ../statistic/statistic_server.cpp ../statistic/statistic_server.h
+statistic_server.o: ../statistic/statistic_server.cpp ../statistic/statistic_server.h \
+		../statistic/statistic.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o statistic_server.o ../statistic/statistic_server.cpp
 
 thread_pool.o: ../thread_pool.cpp ../thread_pool.h

@@ -1,20 +1,44 @@
 #include "statistic.h"
 
-Statistic::Statistic()
+Statistic::Statistic(uint64_t size)
+	: max_count(size)
 {
-
 }
 
 Statistic::~Statistic() noexcept
 {
 }
 
+void Statistic::receiveEvent(const Statistic::Event & ev)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	if (events.size() == max_count)
+	{
+		events.pop_front();
+	}
+
+	events.push_back(ev);
+}
+
 void Statistic::build()
 {
+	std::lock_guard<std::mutex> lock(mutex);
+	buildStart();
 	for (const auto& event : events)
 	{
-		receiveEvent(event);
+		buildEvent(event);
 	}
+	buildFinish();
+}
+
+const std::string &Statistic::getBuildedData() const
+{
+	return build_data;
+}
+
+void Statistic::setBuildData(const std::string & d)
+{
+	build_data = d;
 }
 
 Statistic::Event::Event(const std::string& ev_name)
@@ -42,4 +66,14 @@ std::list<std::string> Statistic::Event::getUserKeys() const
 		out_keys.push_back(iter->first);
 	}
 	return out_keys;
+}
+
+const std::string& Statistic::Event::getName() const
+{
+    return name;
+}
+
+std::tm *Statistic::Event::getCreateDate() const
+{
+    return create_date;
 }

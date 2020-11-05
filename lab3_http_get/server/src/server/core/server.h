@@ -21,14 +21,14 @@ public:
 	int32_t getPort() const;
 	uint16_t getMaxConnection() const;
 	bool isListenLocal() const;
-	void setHandlerCallback(std::function<void(const std::string&, int32_t)> value);
+	void setHandlerCallback(std::function<void(const std::string&, const std::string&, int32_t)> value);
 	void write(int32_t, const std::string&);
 	void closeConnection(int32_t);
 	void stop();
 
 private:
 	inline bool newConnection(int32_t);
-	inline bool receive(int32_t, bool &is_close_conn);
+	inline bool receive(int32_t, const std::string &, bool &is_close_conn);
 
 private:
 	int sockfd;
@@ -36,5 +36,5 @@ private:
 	uint16_t max_connection = 10;
 	bool listen_local = false;
 	std::unique_ptr<ConnectionList> connections;
-	std::function<void(const std::string&, int32_t)> cb_handler;
+	std::function<void(const std::string&, const std::string&, int32_t)> cb_handler;
 };

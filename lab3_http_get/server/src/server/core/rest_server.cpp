@@ -23,15 +23,15 @@ void RestServer::run()
 	tcp_socket_server.setMaxConnection(6);
 	tcp_socket_server.setListenLocal(false);
 	tcp_socket_server.setPort(8888);
-	std::function<void(const std::string&, int32_t)> socket_handler =
-			std::bind(&RestServer::receivePackage, this, _1, _2);
-	tcp_socket_server.setHandlerCallback([&](const std::string& data, int32_t socket)
+	std::function<void(const std::string&, const std::string&, int32_t)> socket_handler =
+			std::bind(&RestServer::receivePackage, this, _1, _2, _3);
+	tcp_socket_server.setHandlerCallback([&](const std::string& data, const std::string& addr, int32_t socket)
 	{
-		pool->enqueue([&](std::string __data, int32_t __socket)
+		pool->enqueue([&](std::string __data, std::string __addr, int32_t __socket)
 		{
 			std::cout << "Current thread id " << std::this_thread::get_id() << std::endl;
-			receivePackage(__data, __socket);
-		}, data, socket);
+			receivePackage(__data, __addr, __socket);
+		}, data, addr, socket);
 	});
 	tcp_socket_server.listenSocket();
 }
@@ -41,9 +41,10 @@ void RestServer::stop()
 	tcp_socket_server.stop();
 }
 
-void RestServer::receivePackage(const std::string& data, int32_t socket)
+void RestServer::receivePackage(const std::string& data, const std::string& addr, int32_t socket)
 {
 	auto request = parsePackage(data);
+	request.setAddress(addr);
 	if (routes.count(request.getRoute()))
 	{
 		auto& handler_orig = routes[request.getRoute()]->getHandler();
