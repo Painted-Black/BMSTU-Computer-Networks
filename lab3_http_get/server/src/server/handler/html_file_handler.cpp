@@ -2,6 +2,8 @@
 #include "core/request.h"
 #include "html_file_handler.h"
 
+constexpr char FILENAME[] = "test.html";
+
 HtmlFileHandler::HtmlFileHandler(std::shared_ptr<Statistic> stat)
 	: RestHandler({"GET"}), statistic(stat)
 {
@@ -18,7 +20,7 @@ void HtmlFileHandler::receive()
 	statistic->receiveEvent(ev);
 
 	std::fstream file;
-	file.open("book.pdf", std::ios_base::in);
+	file.open(FILENAME, std::ios_base::in);
 	if (file.is_open())
 	{
 		std::string body;
@@ -27,7 +29,7 @@ void HtmlFileHandler::receive()
 
 		res.setBody(body);
 		res.setStatusCode(Responce::Ok);
-		res.addHeader("Content-Type", "application/pdf");
+		res.addHeader("Content-Type", "text/html");
 		file.close();
 	}
 	else
