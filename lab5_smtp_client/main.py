@@ -10,7 +10,7 @@ import mimetypes
 MESSAGE = "Hello, see attached files!"
 SUBJECT = "Hello files"
 
-# python3 main.py --r=syzygy.sys@gmail.com --s=novocaine2121@gmail.com --p=Bjauno1998 --dir=./search_dir --keyword=Hello
+# python3 main.py --r=RECEIVER --s=SENDER --p=PASS --dir=./search_dir --keyword=KEYWORD
 
 def parse_args():
 	argparser = argparse.ArgumentParser(description='Python SMTP client using smtplib module')
