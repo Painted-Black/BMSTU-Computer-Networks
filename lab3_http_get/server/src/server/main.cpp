@@ -57,7 +57,7 @@ __attribute__((noreturn)) void sigintCatcher(int signum)
 int main()
 {
 	signal(SIGINT, sigintCatcher);
-
+	signal(SIGABRT, sigintCatcher);
 	constexpr uint64_t count_buffer = 5000;
 	std::shared_ptr<Statistic> statistic(new StatisticServer(count_buffer));
 	server.addRoute(

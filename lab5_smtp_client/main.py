@@ -17,6 +17,7 @@ def parse_args():
 	argparser.add_argument("--receiver", help="Receiver address")
 	argparser.add_argument("--sender", help="Sender address")
 	argparser.add_argument("--pswd", help="Sender password")
+	argparser.add_argument("p", help="Test")
 	argparser.add_argument("--keyword", help="Keyword to search in txt files")
 	argparser.add_argument("--dir", help="Path to dir where to find txt files with keyword")
 	args = argparser.parse_args()
