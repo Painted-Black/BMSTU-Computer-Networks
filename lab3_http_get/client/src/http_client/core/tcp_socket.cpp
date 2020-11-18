@@ -36,10 +36,11 @@ std::string SenderHandler::sendBytea(const std::string & bytea, const std::strin
 	}
 
 	std::string result;
-	char buf[1024];
-	while (recv(sockfd, buf, 1024, MSG_WAITALL) > 0)
+	char buf[1024] = { '\0' };
+	ssize_t read_count = 0;
+	while ((read_count = recv(sockfd, buf, 1024, MSG_WAITALL)) > 0)
 	{
-		result += buf;
+		result.append(buf, static_cast<std::string::size_type>(read_count));
 	}
 
 	close(sockfd);

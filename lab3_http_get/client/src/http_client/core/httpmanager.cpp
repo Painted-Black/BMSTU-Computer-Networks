@@ -69,11 +69,14 @@ Responce HttpManager::toResponce(const std::string & data)
 	PackagePart current_part = None;
 	std::string::size_type indexer = 0;
 	Responce responce;
-	std::stringstream bodybuffer;
+	std::string body;
 	while (indexer != std::string::npos)
 	{
 		std::string::size_type last_indexer = data.find_first_of("\r\n", indexer);
-		std::string boff = data.substr(indexer, last_indexer - indexer);
+		std::string::size_type diff_count =
+				last_indexer == std::string::npos ? std::string::npos : last_indexer - indexer;
+
+		std::string boff = data.substr(indexer, diff_count);
 		if (current_part == None)
 		{
 			uint64_t status_code;
@@ -101,7 +104,8 @@ Responce HttpManager::toResponce(const std::string & data)
 		}
 		else
 		{
-			bodybuffer << boff;
+			body = data.substr(indexer, data.size() - 2);
+			break;
 		}
 
 		indexer = last_indexer == std::string::npos ? last_indexer : last_indexer + 2;
@@ -112,7 +116,6 @@ Responce HttpManager::toResponce(const std::string & data)
 	std::stringstream stream(headers.at("Content-Length"));
 	stream >> count;
 
-	std::string body = bodybuffer.str();
 	body.resize(count);
 	responce.setBody(body);
 	return responce;
