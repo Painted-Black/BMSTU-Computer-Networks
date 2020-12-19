@@ -1,0 +1,218 @@
+\documentclass[a4paper,14pt]{article}
+\usepackage{blindtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[14pt]{extsizes}
+\geometry{left=3cm}
+\geometry{right=1.5cm}
+\geometry{top=2cm}
+\geometry{bottom=2cm}
+\pagestyle{plain}
+\usepackage{pgfplots}
+\usepackage{filecontents}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\DeclareGraphicsExtensions{.png}
+\graphicspath{{images/}}
+\usetikzlibrary{datavisualization}
+\usetikzlibrary{datavisualization.formats.functions}
+\usepackage{tabularx}
+\pgfplotsset{width=7 cm}
+\usepackage{xcolor}
+%\renewcommand{\rmdefault}{ftm}
+%\usepackage{mathptmx}
+\usepackage{setspace}
+%\usepackage{minted}
+%\полуторный интервал
+\onehalfspacing
+\usepackage{colortbl}
+\usepackage{tocloft}
+\frenchspacing
+\setcounter{page}{3}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{multirow}
+
+\renewcommand{\cftsecdotsep}{\cftdot}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftsecdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftsecdotsep}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{\cftsecdotsep}}
+
+%\renewcommand\cftchapdotsep{\cftdot}
+%\renewcommand\cftsecdotsep{\cftdot}
+%\renewcommand{\cftchapleader}{\cftdotfill{\cftchapdotsep}}
+
+% Для измененных титулов глав:
+% % подключаем нужные пакеты
+%\definecolor{gray75}{gray}{0.75} % определяем цвет
+%\newcommand{\hsp}{\hspace{20pt}} % длина линии в 20pt
+% titleformat определяет стиль
+%\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{black}{|}\hsp}{0pt}{\Huge\bfseries}
+%\usepackage{titlesec, blindtext, color}
+%\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{black}{|}\hsp}{0pt}{\Huge\bfseries}
+
+% Для листинга кода:
+\lstset{ %
+extendedchars=\true,
+inputencoding=utf8,
+morekeywords={include, printf},
+texcl=\true,
+breaklines=\true,
+escapeend=\end{russian},
+escapechar=\%,
+keepspaces=\true,
+language=c,                 % выбор языка для подсветки
+basicstyle=\small\sffamily, % размер и начертание шрифта для подсветки кода
+numbers=left,               % где поставить нумерацию строк (слева\справа)
+numberstyle=\tiny,           % размер шрифта для номеров строк
+stepnumber=1,                   % размер шага между двумя номерами строк
+numbersep=5pt,                % как далеко отстоят номера строк от подсвечиваемого кода
+showspaces=\true,            % показывать или нет пробелы специальными отступами
+showstringspaces=\true,      % показывать или нет пробелы в строках
+showtabs=false,             % показывать или нет табуляцию в строках
+frame=single,              % рисовать рамку вокруг кода
+tabsize=4,                 % размер табуляции по умолчанию равен 2 пробелам
+captionpos=t,              % позиция заголовка вверху [t] или внизу [b]
+breaklines=true,           % автоматически переносить строки (да\нет)
+breakatwhitespace=false, % переносить строки только если есть пробел
+escapeinside={\//*}{*)}   % если нужно добавить комментарии в коде
+}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+
+    \begin{table}
+        \centering
+        \footnotesize
+        \begin{tabular}{cc}
+            \multirow{8}{*}{\includegraphics[scale=0.35]{bmstu.jpg}}
+             &                                                                           \\
+             &                                                                           \\
+             & \textbf{Министерство науки и высшего образования Российской Федерации}    \\
+             & \textbf{Федеральное государственное бюджетное образовательное учреждение} \\
+             & \textbf{высшего образования}                                              \\
+             & \textbf{<<Московский государственный технический}                         \\
+             & \textbf{университет имени Н.Э. Баумана>>}                                 \\
+             & \textbf{(МГТУ им. Н.Э. Баумана)}                                          \\
+        \end{tabular}
+    \end{table}
+
+    \vspace{-2.5cm}
+
+    \begin{flushleft}
+        \rule[-1cm]{\textwidth}{3pt}
+        \rule{\textwidth}{1pt}
+    \end{flushleft}
+
+    \begin{flushleft}
+        ФАКУЛЬТЕТ Информатика и системы управления
+    \end{flushleft}
+    КАФЕДРА Программное обеспечение ЭВМ и информационные технологии
+
+    \vspace{3cm}
+
+    \begin{center}
+        \textbf{Лабораторная работа № 9} \\
+        \textbf{Дисциплина: <<Компьютерные сети>>}
+        \vspace{0.5cm}
+    \end{center}
+
+
+    \vspace{3cm}
+
+    \begin{flushleft}
+        \begin{tabular}{ll}
+            \textbf{Студент}       & Овчинникова А. П. \\
+            \textbf{Группа}        & ИУ7-75Б           \\
+            \textbf{Преподаватель} & Рогозин Н. О.     \\
+        \end{tabular}
+    \end{flushleft}
+
+    \vspace{3cm}
+
+    \begin{center}
+        Москва, 2020 г.
+    \end{center}
+
+\end{titlepage}
+
+\setcounter{page}{2}
+
+Пример назначения адреса Server 0 из подсети 1 представлен на рисунке \ref{fig:server0}.
+
+\begin{figure}[!h]
+    \center{\includegraphics[width=14cm]{server0}}
+    \caption{Настройка Server 0.}
+    \label{fig:server0}
+\end{figure}
+
+\textbf{Настройка VLan на коммутаторе 2 уровня}
+
+Последовательность команд для настройки коммутатора:
+
+\begin{lstlisting}
+en
+conf t
+interface vlan 30
+interface range FastEthernet0/5-FastEthernet0/7
+switchport mode access
+switchport access vlan 30
+
+interface vlan 20
+interface range FastEthernet0/3-FastEthernet0/4
+switchport mode access
+switchport access vlan 20
+
+interface vlan 10
+interface range FastEthernet0/1-FastEthernet0/2
+switchport mode access
+switchport access vlan 10
+\end{lstlisting}
+
+С помощью команды \textit{show vlan} можно проверить результат (\ref{fig:sw_vlan}).
+
+\begin{figure}[!h]
+    \center{\includegraphics[width=14cm]{sw_vlan}}
+    \caption{Настройка Switch 0.}
+    \label{fig:sw_vlan}
+\end{figure}
+
+\textbf{Настройка VLan на коммутаторе 3 уровня/маршрутизаторе}
+
+Последовательность команд для найстройки VLan на маршрутизаторе:
+
+\begin{lstlisting}
+en
+conf t
+
+int g0/0/0.1
+encapsulation dot1q 10
+exit
+
+int g0/0/0.2
+encapsulation dot1q 20
+exit
+
+int g0/0/0.3
+encapsulation dot1q 30
+exit
+\end{lstlisting}
+
+На рисунке \ref{fig:sch} выделена и озаглавлена каждая виртуальная локальная сеть.
+
+\begin{figure}[!h]
+    \center{\includegraphics[width=14cm]{sch}}
+    \caption{Виртуальные локальные сети.}
+    \label{fig:sch}
+\end{figure}
+
+
+\end{document}
