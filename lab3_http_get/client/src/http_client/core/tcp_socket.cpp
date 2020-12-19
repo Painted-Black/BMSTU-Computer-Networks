@@ -29,7 +29,8 @@ std::string SenderHandler::sendBytea(const std::string & bytea, const std::strin
 		return std::string();
 	}
 
-	if (sendto(sockfd, static_cast<const void*>(bytea.c_str()), bytea.size(), MSG_DONTROUTE | MSG_WAITALL, nullptr, 0) < 0)
+//	if (sendto(sockfd, static_cast<const void*>(bytea.c_str()), bytea.size(), MSG_DONTROUTE | MSG_WAITALL, nullptr, 0) < 0)
+	if (sendto(sockfd, static_cast<const void*>(bytea.c_str()), bytea.size(), 0, nullptr, 0) < 0)
 	{
 		printf("sendto() failed: %d\n", errno);
 		return std::string();
@@ -38,7 +39,8 @@ std::string SenderHandler::sendBytea(const std::string & bytea, const std::strin
 	std::string result;
 	char buf[1024] = { '\0' };
 	ssize_t read_count = 0;
-	while ((read_count = recv(sockfd, buf, 1024, MSG_WAITALL)) > 0)
+//	while ((read_count = recv(sockfd, buf, 1024, MSG_WAITALL)) > 0)
+	while ((read_count = recv(sockfd, buf, 1024, 0)) > 0)
 	{
 		result.append(buf, static_cast<std::string::size_type>(read_count));
 	}

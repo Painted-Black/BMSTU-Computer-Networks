@@ -17,6 +17,12 @@ std::list<std::string> split(const std::string& text, const std::string& del)
 	return out_data;
 }
 
+/**
+ * @brief Удаляет символы chars из string до первого символа, не входящего в char
+ * @param string
+ * @param chars
+ * @return
+ */
 std::string trim(const std::string& string, const std::string& chars)
 {
 	std::string::size_type f_idx = string.find_first_not_of(chars);
@@ -24,6 +30,11 @@ std::string trim(const std::string& string, const std::string& chars)
 	return string.substr(f_idx, s_idx - f_idx + 1);
 }
 
+/**
+ * @brief Отправка и получение пакетов
+ * @param req
+ * @return
+ */
 Responce HttpManager::httpGet(const Request & req)
 {
 	const auto& url = req.getUrl();
@@ -31,6 +42,11 @@ Responce HttpManager::httpGet(const Request & req)
 	return toResponce(body);
 }
 
+/**
+ * @brief Преобразование Request в пакет
+ * @param req
+ * @return
+ */
 std::string HttpManager::fromRequest(const Request & req)
 {
 	constexpr char Line_Delimer[] = "\r\n";
@@ -53,6 +69,11 @@ std::string HttpManager::fromRequest(const Request & req)
 	return sstream.str();
 }
 
+/**
+ * @brief преобразование приходящего пакета в класс Responce
+ * @param data
+ * @return
+ */
 Responce HttpManager::toResponce(const std::string & data)
 {
 

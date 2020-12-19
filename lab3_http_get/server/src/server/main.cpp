@@ -6,44 +6,6 @@
 #include <handler/html_file_handler.h>
 #include "statistic/statistic_server.h"
 
-////class A : public RestHandler
-////{
-////public:
-////	A(const std::list<std::string>& k) : RestHandler(k) {}
-////	virtual ~A(){}
-////	void receive() override
-////	{
-////		auto& responce = getResponce();
-////		responce.setStatusCode(Responce::Ok);
-////		responce.setBody("Tests");
-////		responce.addHeader("Content-Type", "text/html");
-////	}
-
-////	std::unique_ptr<RestHandler> clone() override
-////	{
-////		return std::unique_ptr<RestHandler>(new A(getMethods()));
-////	}
-////};
-
-////class B : public RestHandler
-////{
-////public:
-////	B(const std::list<std::string>& k) : RestHandler(k) {}
-////	virtual ~B(){}
-////	void receive() override
-////	{
-////		auto& responce = getResponce();
-////		responce.setStatusCode(Responce::Ok);
-////		responce.setBody("Hellos");
-////		responce.addHeader("Content-Type", "text/html");
-////	}
-
-//	std::unique_ptr<RestHandler> clone() override
-//	{
-//		return std::unique_ptr<RestHandler>(new B(getMethods()));
-//	}
-//};
-
 static RestServer server;
 
 __attribute__((noreturn)) void sigintCatcher(int signum)
@@ -54,6 +16,8 @@ __attribute__((noreturn)) void sigintCatcher(int signum)
 	exit(0);
 }
 
+// for i in {1..100}; do curl localhost:8888/html; done
+// Проверка, подряд 100 соединений
 int main()
 {
 	signal(SIGINT, sigintCatcher);
@@ -64,9 +28,6 @@ int main()
 				std::make_unique<RestRoute>("/statistic", std::unique_ptr<RestHandler>(new HandlerStatistic(statistic))));
 	server.addRoute(std::make_unique<RestRoute>("/html", std::unique_ptr<RestHandler>(new HtmlFileHandler(statistic))));
 
-//	std::list<std::string> method = {"GET"};
-//	server.addRoute(std::make_unique<RestRoute>("/tests", std::unique_ptr<RestHandler>(new A(method))));
-//	server.addRoute(std::make_unique<RestRoute>("/hellos", std::unique_ptr<RestHandler>(new B(method))));
 	server.run();
 	return 0;
 }

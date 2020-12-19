@@ -13,7 +13,7 @@ ThreadPool::ThreadPool(size_t threads)
 
 				{
 					std::unique_lock<std::mutex> lock(this->queue_mutex);
-					this->condition.wait(lock, [this]{ return this->stop || !this->tasks.empty(); });
+					this->condition.wait(lock, [this]{ return this->stop || !this->tasks.empty(); }); // ждем, пока не появится место в очереди
 					if(this->stop && this->tasks.empty())
 					{
 						return;
@@ -34,7 +34,7 @@ ThreadPool::~ThreadPool()
 		std::unique_lock<std::mutex> lock(queue_mutex);
 		stop = true;
 	}
-	condition.notify_all();
+	condition.notify_all(); // уведомить все блокированные на condition
 	for(std::thread &worker: workers)
 		worker.join();
 }

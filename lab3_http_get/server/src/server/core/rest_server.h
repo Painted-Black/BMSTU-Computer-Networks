@@ -14,7 +14,7 @@ class ThreadPool;
 class RestServer final
 {
 public:
-	void setStatistic(std::shared_ptr<Statistic>);
+	void setStatistic(std::shared_ptr<Statistic>); // unused
 	void addRoute(std::unique_ptr<RestRoute>);
 	void run();
 	void stop();

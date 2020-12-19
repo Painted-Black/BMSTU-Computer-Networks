@@ -2,7 +2,7 @@
 #include "core/request.h"
 #include "html_file_handler.h"
 
-constexpr char FILENAME[] = "test.html";
+constexpr char FILENAME[] = "../files/test.html";
 
 HtmlFileHandler::HtmlFileHandler(std::shared_ptr<Statistic> stat)
 	: RestHandler({"GET"}), statistic(stat)
@@ -25,7 +25,7 @@ void HtmlFileHandler::receive()
 	{
 		std::string body;
 		body.assign((std::istreambuf_iterator<char>(file)),
-					std::istreambuf_iterator<char>());
+					 std::istreambuf_iterator<char>());
 
 		res.setBody(body);
 		res.setStatusCode(Responce::Ok);

@@ -23,10 +23,11 @@ void RestServer::run()
 	tcp_socket_server.setMaxConnection(6);
 	tcp_socket_server.setListenLocal(false);
 	tcp_socket_server.setPort(8888);
-	std::function<void(const std::string&, const std::string&, int32_t)> socket_handler =
-			std::bind(&RestServer::receivePackage, this, _1, _2, _3);
+//	std::function<void(const std::string&, const std::string&, int32_t)> socket_handler =
+//			std::bind(&RestServer::receivePackage, this, _1, _2, _3);
 	tcp_socket_server.setHandlerCallback([&](const std::string& data, const std::string& addr, int32_t socket)
 	{
+		// берем из пула свободный поток (если такого нет, встаем в очередь)
 		pool->enqueue([&](std::string __data, std::string __addr, int32_t __socket)
 		{
 			std::cout << "Current thread id " << std::this_thread::get_id() << std::endl;
@@ -45,15 +46,15 @@ void RestServer::receivePackage(const std::string& data, const std::string& addr
 {
 	auto request = parsePackage(data);
 	request.setAddress(addr);
-	if (routes.count(request.getRoute()))
+	if (routes.count(request.getRoute())) // если есть такой роут
 	{
-		auto& handler_orig = routes[request.getRoute()]->getHandler();
-		const auto& methods = handler_orig.getMethods();
+		auto handler_orig = routes[request.getRoute()]->getHandler().clone();
+		const auto& methods = handler_orig->getMethods();
 		const std::string& request_method = request.getMethod();
 		bool is_find = std::find(methods.cbegin(), methods.cend(), request_method) != methods.cend();
 		if (is_find)
 		{
-			RestHandler::Responce responce = handler_orig.receive(request);
+			RestHandler::Responce responce = handler_orig->receive(request);
 			writeResponce(socket, responce);
 			tcp_socket_server.closeConnection(socket);
 		}
@@ -121,7 +122,7 @@ RestHandler::Request RestServer::parsePackage(const std::string& data)
 			bodybuffer << boff;
 		}
 
-		indexer = last_indexer == std::string::npos ? last_indexer : last_indexer + 2;
+		indexer = last_indexer == std::string::npos ? last_indexer : last_indexer + 2; // 2 потому что \r\n
 	}
 	request.setBody(bodybuffer.str());
 	return request;

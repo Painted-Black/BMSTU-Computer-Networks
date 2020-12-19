@@ -10,7 +10,7 @@ public:
 	class Request;
 	class Responce;
 
-	enum TypeLoading
+	enum TypeLoading // unused
 	{
 		LoadMore,
 		Stop
@@ -20,7 +20,7 @@ public:
 	virtual ~RestHandler();
 	const Responce &receive(const Request &);
 	virtual TypeLoading loadingDataType() const;
-	virtual std::unique_ptr<RestHandler> clone() = 0;
+	virtual std::unique_ptr<RestHandler> clone() = 0; // для unique_ptr, одно соединение -- один клон
 	const std::list<std::string>& getMethods() const;
 
 protected:

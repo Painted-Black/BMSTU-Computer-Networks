@@ -1,5 +1,9 @@
 #include "statistic.h"
 
+/**
+ * @brief Statistic::Statistic
+ * @param size -- размер пула событий
+ */
 Statistic::Statistic(uint64_t size)
 	: max_count(size)
 {
@@ -9,6 +13,10 @@ Statistic::~Statistic() noexcept
 {
 }
 
+/**
+ * @brief Добавление события в пул. Если пул заполнен, то первое событие удаляется.
+ * @param ev
+ */
 void Statistic::receiveEvent(const Statistic::Event & ev)
 {
 	std::lock_guard<std::mutex> lock(mutex);
@@ -20,6 +28,9 @@ void Statistic::receiveEvent(const Statistic::Event & ev)
 	events.push_back(ev);
 }
 
+/**
+ * @brief Формирование статистики. Проходит по пулу и заполняет структуру данных данными
+ */
 void Statistic::build()
 {
 	std::lock_guard<std::mutex> lock(mutex);
@@ -31,16 +42,28 @@ void Statistic::build()
 	buildFinish();
 }
 
+/**
+ * @brief Получить сформированную статистике
+ * @return
+ */
 const std::string &Statistic::getBuildedData() const
 {
 	return build_data;
 }
 
+/**
+ * @brief
+ * @param d
+ */
 void Statistic::setBuildData(const std::string & d)
 {
 	build_data = d;
 }
 
+/**
+ * @brief При создании определяется имя и дата-время создания
+ * @param ev_name
+ */
 Statistic::Event::Event(const std::string& ev_name)
 {
 	time_t now = time(nullptr);
@@ -48,6 +71,11 @@ Statistic::Event::Event(const std::string& ev_name)
 	name = ev_name;
 }
 
+/**
+ * @brief Добавление данных в событие
+ * @param key
+ * @param value
+ */
 void Statistic::Event::setUserData(const std::string & key, const std::string & value)
 {
 	user_data[key] = value;

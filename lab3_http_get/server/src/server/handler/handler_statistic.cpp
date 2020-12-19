@@ -5,6 +5,9 @@ HandlerStatistic::HandlerStatistic(std::shared_ptr<Statistic> stat)
 {
 }
 
+/**
+ * @brief Формирует ответ, который автоматически отправляет его при выходе из функции
+ */
 void HandlerStatistic::receive()
 {
 	auto& resp = getResponce();

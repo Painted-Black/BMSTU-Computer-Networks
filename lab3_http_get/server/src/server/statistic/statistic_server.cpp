@@ -11,6 +11,10 @@ StatisticServer::StatisticServer(uint64_t size)
 
 }
 
+/**
+ * @brief Обработка одного события
+ * @param ev
+ */
 void StatisticServer::buildEvent(const Statistic::Event & ev)
 {
 	time_t now = time(nullptr);
@@ -22,19 +26,25 @@ void StatisticServer::buildEvent(const Statistic::Event & ev)
 	const auto& host = ev.getUserData("user");
 	const auto& route = ev.getUserData("route");
 
-	if (hour == 0)
+	if (hour == 0) // события за последний час
 	{
-		auto& data = event_data.host_data[host];
-		++std::get<0>(data);
-		std::get<1>(data).insert(route);
+		auto& data = event_data.host_data[host]; // если хоста нет, он создастся (map)
+		++std::get<0>(data); // увеличиваем число обращений
+		std::get<1>(data).insert(route); // добавляем уникальный роут
 	}
 }
 
+/**
+ * @brief очистка буферной структуры, содержащей старую статистику
+ */
 void StatisticServer::buildStart()
 {
 	event_data.host_data.clear();
 }
 
+/**
+ * @brief Формирование json из собранной статистики
+ */
 void StatisticServer::buildFinish()
 {
 	std::stringstream json_stream;
